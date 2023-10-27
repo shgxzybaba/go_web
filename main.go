@@ -6,7 +6,6 @@ import (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.pa
 
 	fmt.Fprintf(w, "Hello, world!\n")
 }
