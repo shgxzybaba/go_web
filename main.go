@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+
+	"github.com/shgxzybaba/go_web01/data"
 )
 
 type Person struct {
@@ -31,6 +33,13 @@ func generateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
 
 func main() {
 	fmt.Println("Hello server!")
+	fmt.Println("Setting up connection to database")
+	err := data.Setup()
+	if err != nil {
+		fmt.Println("Could not open database!", err)
+		return
+	}
+
 	mux := http.NewServeMux()
 	files := http.FileServer(http.Dir("public"))
 
