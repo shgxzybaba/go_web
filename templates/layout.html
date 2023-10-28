@@ -2,21 +2,20 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=9">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../static/styles.css">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../static/styles.css" />
     <title>Go Web</title>
   </head>
   <body>
     {{ template "navbar" . }}
 
     <div class="flex bg-slate-600">
-
-      {{ template "content" . }}
-
-    </div> <!-- /container -->
-
+      <div>{{ template "error" . }}</div>
+    </div>
+    <!-- /container -->
+    {{ template "content" . }}
   </body>
 </html>
 

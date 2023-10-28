@@ -8,18 +8,23 @@ import (
 	"github.com/shgxzybaba/go_web01/data"
 )
 
-type Person struct {
-	Name string
-	Age uint16
+type Data struct {
+	Response interface{}
+	err string
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	person := Person{
-		Name: "Akinduro",
-		Age: 30,
-	}
 
-	generateHTML(w, person, "layout", "navbar", "content")
+	response := Data{}
+	students, err := data.FetchAllStudents()
+	if err != nil {
+		response.err = err.Error()
+		generateHTML(w, response, "layout", "navbar", "content", "error")
+        return // Exit the function to prevent further processing
+	}
+	response.Response, response.err = students, ""
+
+	generateHTML(w, response, "layout", "navbar", "content", "error")
 }
 
 func generateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
@@ -35,6 +40,7 @@ func main() {
 	fmt.Println("Hello server!")
 	fmt.Println("Setting up connection to database")
 	err := data.Setup()
+	defer data.ShutDown()
 	if err != nil {
 		fmt.Println("Could not open database!", err)
 		return

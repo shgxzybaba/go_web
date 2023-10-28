@@ -12,7 +12,7 @@ var (
 )
 
 func Setup() (err error) {
-	DB, err := sql.Open("postgres", "host=127.0.0.1 port=5432 user=akindurooluwasegun dbname=go_web01 sslmode=disable")
+	DB, err = sql.Open("postgres", "host=127.0.0.1 port=5432 user=akindurooluwasegun dbname=go_web01 sslmode=disable")
 
 	if err != nil {
 
@@ -24,6 +24,11 @@ func Setup() (err error) {
 	}
 	return
 
+}
+
+func ShutDown() {
+	fmt.Println("Closing database connections!")
+	DB.Close()
 }
 
 

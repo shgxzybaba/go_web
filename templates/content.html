@@ -1,6 +1,8 @@
 {{ define "content" }}
-
-<div class="flex-auto bg-red-600">Hello world {{ .Name }}</div>
-<p class="float-none to-blue-900">You are {{ .Age }} years of age</p>
-
+    {{ range .Response }}
+        <div class="flex-auto bg-red-600 text-blue-500">Hello, {{ .Username }}!</div>
+        <p class="text-blue-900">Your id is {{ .Id }}</p>
+    {{ else }}
+        <p>No data available.</p>
+    {{ end }}
 {{ end }}
