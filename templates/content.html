@@ -1,5 +1,5 @@
 {{ define "content" }}
-    {{ range .Response }}
+    {{ range . }}
         <div class="flex-auto bg-red-600 text-blue-500">Hello, {{ .Username }}!</div>
         <p class="text-blue-900">Your id is {{ .Id }}</p>
     {{ else }}

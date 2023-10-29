@@ -10,7 +10,7 @@ import (
 
 type Data struct {
 	Response interface{}
-	err string
+	Err string
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,11 +18,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	response := Data{}
 	students, err := data.FetchAllStudents()
 	if err != nil {
-		response.err = err.Error()
+		response.Err = err.Error()
 		generateHTML(w, response, "layout", "navbar", "content", "error")
         return // Exit the function to prevent further processing
 	}
-	response.Response, response.err = students, ""
+	response.Response, response.Err = students, ""
 
 	generateHTML(w, response, "layout", "navbar", "content", "error")
 }
