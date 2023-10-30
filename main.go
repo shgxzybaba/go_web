@@ -10,7 +10,7 @@ import (
 
 type Data struct {
 	Response interface{}
-	Err string
+	Err      string
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +20,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		response.Err = err.Error()
 		generateHTML(w, response, "layout", "navbar", "content", "error")
-        return // Exit the function to prevent further processing
+		return // Exit the function to prevent further processing
 	}
 	response.Response, response.Err = students, ""
 
@@ -32,8 +32,13 @@ func generateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
 	for _, file := range fn {
 		files = append(files, fmt.Sprintf("templates/%s.html", file))
 	}
+
 	templates := template.Must(template.ParseFiles(files...))
-	templates.ExecuteTemplate(w, "layout", data)
+	if err1 := templates.ExecuteTemplate(w, "layout", data); err1 != nil {
+		if _, err := fmt.Fprintln(w, "An error occurred while loading template", err1); err != nil {
+			fmt.Println("Could not write to response writer", err1)
+		}
+	}
 }
 
 func main() {
@@ -54,7 +59,10 @@ func main() {
 
 	server := &http.Server{
 		Handler: mux,
-		Addr: "0.0.0.0:8088",
+		Addr:    "0.0.0.0:8088",
 	}
-	server.ListenAndServe()
+	if e := server.ListenAndServe(); e != nil {
+		fmt.Println("Unable to start server", e)
+		return
+	}
 }

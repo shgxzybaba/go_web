@@ -7,9 +7,7 @@ import (
 	"github.com/shgxzybaba/go_web01/data"
 )
 
-
-
-func session(w http.ResponseWriter, r *http.Request) (session data.Session, err error) {
+func Session(w http.ResponseWriter, r *http.Request) (session data.Session, err error) {
 
 	cookie, err := r.Cookie("_sessionId")
 	if err != nil {
@@ -17,7 +15,7 @@ func session(w http.ResponseWriter, r *http.Request) (session data.Session, err 
 			Uuid: cookie.Value,
 		}
 		if ok, _ := session.Check(); !ok {
-			err = errors.New("Invalid session id")
+			err = errors.New("invalid session id")
 		}
 
 	}

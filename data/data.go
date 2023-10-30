@@ -4,28 +4,26 @@ import (
 	"database/sql"
 	"fmt"
 
-	"time"
 	_ "github.com/lib/pq"
+	"time"
 )
 
 var (
 	DB *sql.DB
 )
 
-
-
 type Session struct {
-	Uuid string
-	UserId int
+	Uuid      string
+	UserId    int
 	CreatedAt time.Time
 }
 
-func(session *Session) Check() (ok bool, err error) {
+func (session *Session) Check() (ok bool, err error) {
 
-		rows, err := DB.Query("SELECT * FROM session where uuid = $1", session.Uuid )
-    if err != nil {
-        return false, err // Return nil slice and error
-    }
+	rows, err := DB.Query("SELECT * FROM sessions where uuid = $1", session.Uuid)
+	if err != nil {
+		return false, err // Return nil slice and error
+	}
 
 	defer rows.Close()
 	ok = rows.Next()
@@ -52,7 +50,6 @@ func ShutDown() {
 	DB.Close()
 }
 
-
 func AllCourses() (courses []string) {
-	return 
+	return
 }
