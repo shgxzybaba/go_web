@@ -2,15 +2,25 @@ package main
 
 import (
 	"fmt"
+	"github.com/shgxzybaba/go_web01/data"
+	"github.com/shgxzybaba/go_web01/security"
 	"html/template"
 	"net/http"
-
-	"github.com/shgxzybaba/go_web01/data"
 )
 
 type Data struct {
 	Response interface{}
 	Err      string
+}
+
+type User struct {
+	Username string
+	Id       int
+}
+
+func (u *User) user(s data.Student) {
+	u.Username = s.Username
+	u.Id = int(s.Id)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +35,31 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	response.Response, response.Err = students, ""
 
 	generateHTML(w, response, "layout", "navbar", "content", "error")
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	method := r.Method
+	if method == "GET" {
+		response := Data{nil, ""}
+		generateHTML(w, response, "layout", "navbar", "content", "login") //todo: make "content" dynamic
+	} else if method == "POST" {
+		user, password := r.FormValue("username"), r.FormValue("password")
+		student, sess, err := security.Login(user, password)
+		var response = Data{}
+		if err != nil {
+			response.Response = nil
+			response.Err = err.Error()
+		} else {
+			u := User{}
+			u.user(student)
+			response.Response = u
+			response.Err = ""
+			w.Header().Set("session-id", sess.Uuid)
+		}
+
+		generateHTML(w, response, "layout", "navbar", "content", "dashboard", "error")
+	}
+
 }
 
 func generateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
@@ -56,6 +91,7 @@ func main() {
 
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/login", loginHandler)
 
 	server := &http.Server{
 		Handler: mux,
