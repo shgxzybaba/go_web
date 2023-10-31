@@ -62,6 +62,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func accountHandler(w http.ResponseWriter, r *http.Request) {
+	panic("Not implemented")
+}
+
 func generateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
 	var files []string
 	for _, file := range fn {
@@ -76,15 +80,11 @@ func generateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
 	}
 }
 
+//todo: create a session validation filter
+
 func main() {
 	fmt.Println("Hello server!")
-	fmt.Println("Setting up connection to database")
-	err := data.Setup()
 	defer data.ShutDown()
-	if err != nil {
-		fmt.Println("Could not open database!", err)
-		return
-	}
 
 	mux := http.NewServeMux()
 	files := http.FileServer(http.Dir("public"))
@@ -92,6 +92,7 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/login", loginHandler)
+	mux.HandleFunc("/account", security.BasicSecurity(accountHandler))
 
 	server := &http.Server{
 		Handler: mux,

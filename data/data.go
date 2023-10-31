@@ -20,27 +20,32 @@ type Session struct {
 
 func (session *Session) Check() (ok bool, err error) {
 
-	rows, err := DB.Query("SELECT * FROM sessions where uuid = $1", session.Uuid)
+	rows := DB.QueryRow("SELECT * FROM sessions where uuid = $1", session.Uuid)
 	if err != nil {
 		return false, err // Return nil slice and error
 	}
 
-	defer rows.Close()
-	ok = rows.Next()
+	ok = rows != nil
 	return
 }
 
-func Setup() (err error) {
+func init() {
+	var err error
+	fmt.Println("Setting up connection to database")
 	DB, err = sql.Open("postgres", "host=127.0.0.1 port=5432 user=akindurooluwasegun dbname=go_web01 sslmode=disable")
 
 	if err != nil {
 
 		fmt.Println("Could not open database", err)
+		panic(err)
 	}
+
 	err = DB.Ping()
 	if err != nil {
 		fmt.Println("Could not reach database", err)
+		panic(err)
 	}
+	fmt.Println("Database connection successful")
 	return
 
 }
