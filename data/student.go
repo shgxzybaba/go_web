@@ -1,5 +1,7 @@
 package data
 
+import "net/http"
+
 type Student struct {
 	Username string
 	Id       uint16
@@ -10,6 +12,10 @@ func (s *Student) CreateSession() (session Session, err error) {
 	session = Session{Uuid: "xyz", UserId: int(s.Id)} //todo: create a UUid generating method for session
 	err = nil
 	return
+}
+
+func AccountHandler(w http.ResponseWriter, r *http.Request) {
+	panic("Not implemented")
 }
 
 func FetchAllStudents() (students []Student, err error) {

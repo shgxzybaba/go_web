@@ -10,11 +10,6 @@
   </head>
   <body>
     {{ template "navbar" . }}
-
-    {{if .Err}}
-    <div>{{ template "error" . }}</div>
-    {{end}}
-    <!-- /container -->
     {{ template "content" .Response }}
   </body>
 </html>

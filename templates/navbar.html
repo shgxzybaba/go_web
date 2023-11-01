@@ -1,7 +1,13 @@
 {{ define "navbar" }}
-<div style="display: fixed; left: 0px;">
-    <ul>
-    <li><i class="fa fa-home" aria-hidden="true"></i>Home</li>
+<div class="fixed p-2 y-10 top-0 left-0 bg-slate-400 w-full h-12 flex flex-row space-x-8">
+    <div class="basis-1/2">
+
+    </div>
+    <ul class="flex flex-row space-x-4 pt-2 pb-2">
+        <li class="mr-4"><i class="fa fa-home" aria-hidden="true"></i>Home</li>
+        <li class="mr-4"><a class="hover:bg-white p-2" href="#">About</a></li>
+        <li class="mr-4"><a class="hover:bg-white p-2" href="/login">Signup</a></li>
+        <li class="mr-4"><a class="hover:bg-white p-2" href="/">Demo</a></li>
     </ul>
 </div>
 {{ end }}
