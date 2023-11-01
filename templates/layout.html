@@ -9,8 +9,12 @@
     <title>Go Web</title>
   </head>
   <body>
+
     {{ template "navbar" . }}
-    {{ template "content" .Response }}
+
+<div class="mt-32">
+  {{ template "content" .Response }}
+</div>
   </body>
 </html>
 

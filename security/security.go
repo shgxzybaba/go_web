@@ -11,7 +11,7 @@ import (
 
 func Session(w http.ResponseWriter, r *http.Request) (session data.Session, err error) {
 
-	cookie, err := r.Cookie("_sessionId")
+	cookie, err := r.Cookie("session-id")
 	if err == nil {
 		session = data.Session{
 			Uuid: cookie.Value,
@@ -86,7 +86,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		var response = utils.Data{}
 		if err != nil {
 			response.Response = nil
-			response.Err = err.Error()
+			response.Err = err.Error() //todo: handle this error properly
 		} else {
 			u := User{}
 			u.user(student)

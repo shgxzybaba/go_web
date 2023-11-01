@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"html/template"
 	"net/http"
 )
@@ -23,4 +24,22 @@ func GenerateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
 type Data struct {
 	Response interface{}
 	Err      string
+}
+
+func (response *Data) ErrorResponse(err error) {
+	response.Response = nil
+	response.Err = err.Error()
+}
+
+func (response *Data) DataResponse(data any) {
+	response.Response = data
+	response.Err = ""
+}
+
+func GenerateUUID() string {
+
+	uuidObj := uuid.New()
+	uuidString := uuidObj.String()
+
+	return uuidString
 }

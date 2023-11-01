@@ -34,6 +34,7 @@ func main() {
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/login", security.LoginHandler)
 	mux.HandleFunc("/account", security.BasicSecurity(data.AccountHandler))
+	mux.HandleFunc("/dashboard", security.BasicSecurity(data.DashboardHandler))
 
 	server := &http.Server{
 		Handler: mux,
