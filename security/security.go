@@ -40,31 +40,22 @@ func BasicSecurity(h http.HandlerFunc) http.HandlerFunc {
 func Login(username, password string) (student data.Student, session data.Session, err error) {
 	// Execute the query
 	rows := data.DB.QueryRow("SELECT id, username, password FROM student WHERE username = $1", username)
-
-	// Initialize a new student object
 	student = data.Student{}
-
-	// Scan the query result into the student object
 	err = rows.Scan(&student.Id, &student.Username, &student.Password)
 
-	// Check for errors during scanning
 	if err != nil {
-		// Handle error during scanning
 		if err == sql.ErrNoRows {
-			// No matching record found, handle accordingly
 			err = errors.New("no matching user found")
 		} else {
 			// Other scanning errors, return the error
 			return
 		}
 	} else {
-		// Check password validity
 		if ok := validatePassword(password, student.Password); !ok {
 			err = errors.New("invalid username/password combination")
 			return
 		}
 
-		// Create session
 		session, err = student.CreateSession()
 	}
 

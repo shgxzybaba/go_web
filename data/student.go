@@ -2,8 +2,10 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"github.com/shgxzybaba/go_web01/utils"
 	"net/http"
+	"time"
 )
 
 type Student struct {
@@ -14,11 +16,50 @@ type Student struct {
 }
 
 type Course struct {
+	Id          int
 	Title       string
 	Description string
+	Today       bool
+	Days        []string
+}
+
+func (c *Course) OfferedDays() (err error) {
+	fmt.Println("Adding offered days to courses")
+
+	query := `select d.name from course_days cd 
+join days d on d.id = cd.day_id
+              join courses c on c.id = cd.course_id
+where c.title = $1 
+`
+	rows, err1 := DB.Query(query, c.Title)
+
+	if err1 != nil {
+		err = err1
+		return
+	}
+
+	for rows.Next() {
+		day := ""
+		err = rows.Scan(&day)
+		if err != nil {
+			return
+		}
+		c.Days = append(c.Days, day)
+	}
+	for _, v := range c.Days {
+		if v == time.Now().Weekday().String() {
+			c.Today = true
+			break
+		}
+	}
+
+	return
+
 }
 
 func (s *Student) addCourses() (err error) {
+	fmt.Println("Adding courses to student")
+
 	query := `
 select c.description, c.title from student_courses sc
 join courses c on sc.course_id = c.id
@@ -37,6 +78,7 @@ where sc.student_id = $1;
 		if err != nil {
 			return
 		}
+		_ = course.OfferedDays() //todo: handle this error properly
 		s.Courses = append(s.Courses, course)
 	}
 	return
@@ -44,6 +86,9 @@ where sc.student_id = $1;
 }
 
 func (s *Student) CreateSession() (session Session, err error) {
+
+	fmt.Println("Creating session")
+
 	uuid := utils.GenerateUUID()
 	session = Session{Uuid: uuid, UserId: int(s.Id)}
 	_, err = DB.Exec("INSERT INTO sessions(user_id, uuid) values ($1, $2)", session.UserId, session.Uuid)

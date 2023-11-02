@@ -1,7 +1,58 @@
 {{define "content"}}
 
-<h1>
-  Welcome {{.Username }}
-</h1>
+<div class="flex flex-col space-y-4 ml-12">
 
+    <h1 class="text-2xl font-extrabold self-start">
+        Welcome {{.Username }}
+    </h1>
+
+    <div class="mb-8 mt-12 flex flex-col space-y-4">
+
+        <h3 class="text-xl font-bold p-2">
+            Here are the courses for today.
+        </h3>
+        <div class="flex flex-row">
+
+            <div class="basis-1/2 flex flex-col ">
+
+                {{range .Courses}}
+                {{if .Today}}
+                <div class="p-2 border-2 border-solid flex flex-row space-x-2">
+                    <div class="self-center p-2">{{.Title}}</div>
+                    <div class="self-center p-2">{{.Description}}</div>
+                </div>
+                {{end}}
+                {{end}}
+            </div>
+
+            <div class="flex basis-1/2 flex-row">
+            </div>
+
+        </div>
+    </div>
+    <div class="mb-8 mt-12 flex flex-col">
+
+        <h3 class="text-xl font-bold p-2">
+            Here are all the courses you offer.
+        </h3>
+        <div class="flex flex-row">
+
+            <div class="basis-1/2 flex flex-col">
+
+                {{range .Courses}}
+                <div class="p-2 border-2 border-solid flex flex-row space-x-2">
+                    <div class="self-center p-2">{{.Title}}</div>
+                    <div class="self-center p-2">{{.Description}}</div>
+                </div>
+                {{end}}
+
+            </div>
+
+            <div class="flex basis-1/2 flex-row">
+            </div>
+
+        </div>
+    </div>
+
+</div>
 {{end}}
