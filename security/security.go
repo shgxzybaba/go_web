@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"github.com/shgxzybaba/go_web01/data"
 	"github.com/shgxzybaba/go_web01/utils"
 	"net/http"
@@ -68,10 +69,7 @@ func validatePassword(sent, expected string) (ok bool) {
 }
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
-	if method == "GET" {
-		response := utils.Data{}
-		utils.GenerateHTML(w, response, "layout", "navbar", "login")
-	} else if method == "POST" {
+	if method == "POST" {
 		user, password := r.FormValue("username"), r.FormValue("password")
 		student, sess, err := Login(user, password)
 		var response = utils.Data{}
@@ -95,6 +93,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+
+func GetLoginPage(c *fiber.Ctx) error {
+	response := utils.Data{}
+	return c.Render("login", response)
 }
 
 type User struct {

@@ -1,48 +1,47 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/template/html/v2"
 	"github.com/shgxzybaba/go_web01/data"
 	"github.com/shgxzybaba/go_web01/security"
 	"github.com/shgxzybaba/go_web01/utils"
-	"net/http"
 )
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+func indexHandler(c *fiber.Ctx) (err error) {
 
 	response := utils.Data{}
 	students, err := data.FetchAllStudents()
 	if err != nil {
 		response.Err = err.Error()
-		utils.GenerateHTML(w, response, "layout", "navbar", "error")
-		return // Exit the function to prevent further processing
+		return c.Render("error", response)
 	}
 	response.Response, response.Err = students, ""
 
-	utils.GenerateHTML(w, response, "layout", "navbar", "index")
+	return c.Render("index", response)
 }
 
 func main() {
 
-	fmt.Println("Hello server!")
-	defer data.ShutDown()
+	log.Info("Hello server!")
 
-	mux := http.NewServeMux()
-	files := http.FileServer(http.Dir("static"))
+	engine := html.New("./templates", ".html")
+	app := fiber.New(fiber.Config{
+		Views:             engine,
+		ViewsLayout:       "layout",
+		PassLocalsToViews: true,
+	})
 
-	mux.Handle("/static/", http.StripPrefix("/static/", files))
-	mux.HandleFunc("/", indexHandler)
-	mux.HandleFunc("/login", security.LoginHandler)
-	mux.HandleFunc("/account", security.BasicSecurity(data.AccountHandler))
-	mux.HandleFunc("/dashboard", security.BasicSecurity(data.DashboardHandler))
+	app.Static("/static/", "./static")
 
-	server := &http.Server{
-		Handler: mux,
-		Addr:    "0.0.0.0:8088",
-	}
+	app.Get("/", indexHandler)
+	app.Get("/login", security.GetLoginPage)
+	//app.Get("/account", security.BasicSecurity(data.AccountHandler))
+	//app.Get("/dashboard", security.BasicSecurity(data.DashboardHandler))
 
-	if e := server.ListenAndServe(); e != nil {
-		fmt.Println("Unable to start server", e)
-		return
+	e := app.Listen(":8085")
+	if e != nil {
+		log.Error("An error occurred while starting the server", e)
 	}
 }
