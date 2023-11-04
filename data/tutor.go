@@ -1,8 +1,8 @@
 package data
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/shgxzybaba/go_web01/utils"
 )
 
 type Tutor struct {
@@ -17,7 +17,12 @@ func GetTutor(c *fiber.Ctx) error {
 
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error: Failed to add courses to the student")
 	}
-	return c.SendString(fmt.Sprintf("Fullname: %s\nExperience: %d", tutor.FullName, tutor.YearsOfExperience))
+	//return c.SendString(fmt.Sprintf("Fullname: %s\nExperience: %d", tutor.FullName, tutor.YearsOfExperience))
+	html, err := utils.GenerateHTML(tutor, "test")
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error: Failed to add courses to the student")
+	}
+	return c.SendString(html)
 }
 
 func getTutorByCourse(course string) (tutor Tutor, err error) {
