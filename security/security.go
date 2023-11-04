@@ -8,7 +8,18 @@ import (
 	"github.com/shgxzybaba/go_web01/data"
 	"github.com/shgxzybaba/go_web01/utils"
 	"net/http"
+	"time"
 )
+
+type User struct {
+	Username string
+	Id       int
+}
+
+func (u *User) user(s data.Student) {
+	u.Username = s.Username
+	u.Id = int(s.Id)
+}
 
 func Session(w http.ResponseWriter, r *http.Request) (session data.Session, err error) {
 
@@ -67,45 +78,30 @@ func validatePassword(sent, expected string) (ok bool) {
 	ok = sent == expected
 	return
 }
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	method := r.Method
-	if method == "POST" {
-		user, password := r.FormValue("username"), r.FormValue("password")
-		student, sess, err := Login(user, password)
-		var response = utils.Data{}
-		if err != nil {
-			response.Response = nil
-			response.Err = err.Error() //todo: handle this error properly
-		} else {
-			u := User{}
-			u.user(student)
-			response.Response = u
-			response.Err = ""
-			w.Header().Set("session-id", sess.Uuid)
-			cookie := &http.Cookie{
-				Name:     "session-id",
-				Value:    sess.Uuid,
-				HttpOnly: true,
-			}
-			http.SetCookie(w, cookie)
-			http.Redirect(w, r, "/dashboard", 301)
+func LoginHandler(c *fiber.Ctx) (err error) {
+	user, password := c.FormValue("username"), c.FormValue("password")
+	student, sess, err := Login(user, password)
+	var response = utils.Data{}
+	if err != nil {
+		return
+	} else {
+		u := User{}
+		u.user(student)
+		response.Response = u
+		response.Err = ""
+		cookie := &fiber.Cookie{
+			Name:     "session-id",
+			Value:    sess.Uuid,
+			HTTPOnly: true,
+			Expires:  time.Now().Add(24 * time.Hour),
 		}
-
+		c.Cookie(cookie)
+		return c.Redirect("/dashboard", 301)
 	}
 
 }
 
 func GetLoginPage(c *fiber.Ctx) error {
 	response := utils.Data{}
-	return c.Render("login", response)
-}
-
-type User struct {
-	Username string
-	Id       int
-}
-
-func (u *User) user(s data.Student) {
-	u.Username = s.Username
-	u.Id = int(s.Id)
+	return c.Render("login", response, "layout")
 }

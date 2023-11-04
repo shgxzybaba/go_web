@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html/v2"
 	"github.com/shgxzybaba/go_web01/data"
 	"github.com/shgxzybaba/go_web01/security"
@@ -19,7 +20,7 @@ func indexHandler(c *fiber.Ctx) (err error) {
 	}
 	response.Response, response.Err = students, ""
 
-	return c.Render("index", response)
+	return c.Render("index", response, "layout")
 }
 
 func main() {
@@ -33,12 +34,17 @@ func main() {
 		PassLocalsToViews: true,
 	})
 
+	app.Use(logger.New(logger.Config{
+		// For more options, see the Config section
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
+	}))
+
 	app.Static("/static/", "./static")
 
 	app.Get("/", indexHandler)
 	app.Get("/login", security.GetLoginPage)
-	//app.Get("/account", security.BasicSecurity(data.AccountHandler))
-	//app.Get("/dashboard", security.BasicSecurity(data.DashboardHandler))
+	app.Post("/login", security.LoginHandler)
+	app.Get("/dashboard", data.DashboardHandler)
 
 	e := app.Listen(":8085")
 	if e != nil {

@@ -1,8 +1,8 @@
 package data
 
 import (
-	"errors"
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"github.com/shgxzybaba/go_web01/utils"
 	"net/http"
 	"time"
@@ -55,6 +55,14 @@ where c.title = $1
 
 	return
 
+}
+func (s *Student) TodaysCourses() (courses []Course) {
+	for _, c := range s.Courses {
+		if c.Today {
+			courses = append(courses, c)
+		}
+	}
+	return
 }
 
 func (s *Student) addCourses() (err error) {
@@ -128,30 +136,28 @@ func FetchAllStudents() (students []Student, err error) {
 	return students, nil // Return the populated slice and no error
 }
 
-func DashboardHandler(w http.ResponseWriter, r *http.Request) {
-	var student Student
-	var response = utils.Data{}
-
-	cookie, err := r.Cookie("session-id")
-	if err != nil {
-		response.ErrorResponse(errors.New("session ID cookie not found"))
-		utils.GenerateHTML(w, response, "layout", "navbar", "error") // Assuming you have an error page template
-		return
+func DashboardHandler(c *fiber.Ctx) error {
+	// Fetch session ID from cookie
+	cookie := c.Cookies("session-id", "")
+	if cookie == "" {
+		return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: Session ID not found in cookie")
 	}
 
-	student, err = getStudentFromSession(cookie.Value)
+	// Get student from session
+	student, err := getStudentFromSession(cookie)
 	if err != nil {
-		response.ErrorResponse(errors.New("failed to get student from session"))
-		utils.GenerateHTML(w, response, "layout", "navbar", "error") // Assuming you have an error page template
-		return
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error: Failed to get student from session")
 	}
 
+	// Add courses to the student
 	err = student.addCourses()
 	if err != nil {
-		response.ErrorResponse(errors.New("failed to add courses to the student"))
-		utils.GenerateHTML(w, response, "layout", "navbar", "error") // Assuming you have an error page template
-		return
+		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error: Failed to add courses to the student")
 	}
-	response.DataResponse(student)
-	utils.GenerateHTML(w, response, "layout", "navbar", "dashboard")
+
+	// Render the dashboard template with the student data
+	return c.Render("dashboard", fiber.Map{
+		"Student":          student,
+		"coursesForTheDay": student.TodaysCourses(),
+	})
 }
