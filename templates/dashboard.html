@@ -45,12 +45,26 @@
                 <div class="p-2 border-2 border-solid flex flex-row space-x-2">
                     <div class="self-center p-2">{{.Title}}</div>
                     <div class="self-center p-2">{{.Description}}</div>
+                    <div>
+                        <button hx-get="/tutor?course={{.Title}}"
+                                hx-trigger="click"
+                                hx-target="#tutor-div"
+                                hx-swap="innerHTML"
+
+                                class="bg-indigo-500 p-2 border-solid rounded text-white self-center"
+                        >
+                            See tutor
+                        </button>
+                    </div>
                 </div>
                 {{end}}
 
             </div>
 
-            <div class="flex basis-1/2 flex-row">
+            <div class="flex basis-1/2 flex-col flex items-center">
+                <div id="tutor-div">
+
+                </div>
             </div>
 
         </div>

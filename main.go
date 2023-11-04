@@ -45,6 +45,7 @@ func main() {
 	app.Get("/login", security.GetLoginPage)
 	app.Post("/login", security.LoginHandler)
 	app.Get("/dashboard", data.DashboardHandler)
+	app.Get("/tutor", data.GetTutor)
 
 	e := app.Listen(":8085")
 	if e != nil {
