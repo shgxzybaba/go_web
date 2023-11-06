@@ -2,8 +2,6 @@ package data
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber/v2"
-	"github.com/shgxzybaba/go_web01/utils"
 	"net/http"
 	"time"
 )
@@ -65,7 +63,7 @@ func (s *Student) TodaysCourses() (courses []Course) {
 	return
 }
 
-func (s *Student) addCourses() (err error) {
+func (s *Student) AddCourses() (err error) {
 	fmt.Println("Adding courses to student")
 
 	query := `
@@ -93,19 +91,9 @@ where sc.student_id = $1;
 
 }
 
-func (s *Student) CreateSession() (session Session, err error) {
-
-	fmt.Println("Creating session")
-
-	uuid := utils.GenerateUUID()
-	session = Session{Uuid: uuid, UserId: int(s.Id)}
-	_, err = DB.Exec("INSERT INTO sessions(user_id, uuid) values ($1, $2)", session.UserId, session.Uuid)
-	return
-}
-
-func getStudentFromSession(uuid string) (student Student, err error) {
+func GetStudentFromId(id int) (student Student, err error) {
 	student = Student{}
-	row := DB.QueryRow("SELECT code, username from student join sessions s on student.code = s.user_id where s.uuid = $1", uuid)
+	row := DB.QueryRow("SELECT code, username from student s where s.id = $1", id)
 	err = row.Scan(&student.Id, &student.Username)
 	return
 }
@@ -134,30 +122,4 @@ func FetchAllStudents() (students []Student, err error) {
 	}
 
 	return students, nil // Return the populated slice and no error
-}
-
-func DashboardHandler(c *fiber.Ctx) error {
-	// Fetch session ID from cookie
-	cookie := c.Cookies("session-id", "")
-	if cookie == "" {
-		return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: Session ID not found in cookie")
-	}
-
-	// Get student from session
-	student, err := getStudentFromSession(cookie)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error: Failed to get student from session")
-	}
-
-	// Add courses to the student
-	err = student.addCourses()
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Internal Server Error: Failed to add courses to the student")
-	}
-
-	// Render the dashboard template with the student data
-	return c.Render("dashboard", fiber.Map{
-		"Student":          student,
-		"coursesForTheDay": student.TodaysCourses(),
-	})
 }

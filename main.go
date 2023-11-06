@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html/v2"
 	"github.com/shgxzybaba/go_web01/data"
+	"github.com/shgxzybaba/go_web01/handlers"
 	"github.com/shgxzybaba/go_web01/security"
 	"github.com/shgxzybaba/go_web01/utils"
 )
@@ -39,13 +40,13 @@ func main() {
 		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
 	}))
 
-	app.Static("/static/", "./static")
+	app.Static("/static", "./static")
 
 	app.Get("/", indexHandler)
 	app.Get("/login", security.GetLoginPage)
 	app.Post("/login", security.LoginHandler)
-	app.Get("/dashboard", data.DashboardHandler)
-	app.Get("/tutor", data.GetTutor)
+	app.Get("/dashboard", handlers.DashboardHandler)
+	app.Get("/tutor", handlers.GetTutor)
 
 	e := app.Listen(":8085")
 	if e != nil {
