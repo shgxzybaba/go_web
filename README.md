@@ -9,9 +9,11 @@
 ### Pages
 1. Index
 2. Login
-3. Dashboard
+3. Logout
+4. Dashboard
   i. Subjects for the day
   ii. Calender
   iii. Reminders
-4. Add lecture notes
+5. Add lecture notes
+6. View previous notes
    

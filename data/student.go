@@ -21,6 +21,11 @@ type Course struct {
 	Days        []string
 }
 
+type CourseNote struct {
+	Text        string
+	CourseTitle string
+}
+
 func (c *Course) OfferedDays() (err error) {
 	fmt.Println("Adding offered days to courses")
 
@@ -122,4 +127,30 @@ func FetchAllStudents() (students []Student, err error) {
 	}
 
 	return students, nil // Return the populated slice and no error
+}
+
+func GetStudentCourseNotes(course string, studentId int) (notes []CourseNote, err error) {
+	query := `SELECT n.text, c.title from notes n
+            join courses c on c.id = n.course_id
+            where n.student_id = $1
+            and c.title = $2`
+	rows, err := DB.Query(query, studentId, course)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		note := CourseNote{}
+		if err := rows.Scan(&note.Text, &note.CourseTitle); err != nil {
+			return nil, err // Return nil slice and error
+		}
+		notes = append(notes, note)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err // Return nil slice and error if there was an error during iteration
+	}
+
+	return
 }
