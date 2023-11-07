@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/shgxzybaba/go_web01/data"
 	"github.com/shgxzybaba/go_web01/security"
@@ -88,6 +87,10 @@ func CreateNote(c *fiber.Ctx) error {
 	if note == "" {
 		return c.Status(fiber.StatusBadRequest).SendString("Note text cannot be empty")
 	}
+	_, err = data.SaveStudentNote(course, sessionData.UserId, note)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("An error occurred while saving note")
+	}
 
-	return errors.New("Not implemented")
+	return AllCourseNotes(c)
 }

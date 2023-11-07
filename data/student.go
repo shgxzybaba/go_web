@@ -154,3 +154,10 @@ func GetStudentCourseNotes(course string, studentId int) (notes []CourseNote, er
 
 	return
 }
+
+func SaveStudentNote(course string, studentId int, note string) (string, error) {
+	query := `insert into notes(text, student_id, course_id)
+select $1, $2, c.id from courses c where c.title = $3`
+	_, err := DB.Exec(query, note, studentId, course)
+	return note, err
+}

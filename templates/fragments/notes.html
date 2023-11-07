@@ -1,17 +1,17 @@
 <div class="flex flex-col items-center space-y-4" id="this">
+    <div id="new-note"></div>
     <h2 class="font-bold text-xl text-blue-500">All notes</h2>
     {{range .Notes}}
     <div class="p-4 self-center border-2 border-solid bg-slate-400">{{.Text}}</div>
     {{else}}
     <div>You do not have any note for this course</div>
-
+    {{end}}
     <button hx-get="/add_note?course={{.Title}}"
             hx-trigger="click"
-            hx-target="#this"
-            hx-swap="outerHTML"
+            hx-target="#new-note"
+            hx-swap="innerHTML"
             class="bg-indigo-500 p-2 border-solid rounded text-white self-center"
     >
         Add a new note to this course
     </button>
-    {{end}}
 </div>
