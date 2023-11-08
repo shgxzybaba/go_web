@@ -22,6 +22,7 @@ type Course struct {
 }
 
 type CourseNote struct {
+	Id          int
 	Text        string
 	CourseTitle string
 }
@@ -130,7 +131,7 @@ func FetchAllStudents() (students []Student, err error) {
 }
 
 func GetStudentCourseNotes(course string, studentId int) (notes []CourseNote, err error) {
-	query := `SELECT n.text, c.title from notes n
+	query := `SELECT n.text,n.id, c.title from notes n
             join courses c on c.id = n.course_id
             where n.student_id = $1
             and c.title = $2`
@@ -142,7 +143,7 @@ func GetStudentCourseNotes(course string, studentId int) (notes []CourseNote, er
 
 	for rows.Next() {
 		note := CourseNote{}
-		if err := rows.Scan(&note.Text, &note.CourseTitle); err != nil {
+		if err := rows.Scan(&note.Text, &note.Id, &note.CourseTitle); err != nil {
 			return nil, err // Return nil slice and error
 		}
 		notes = append(notes, note)

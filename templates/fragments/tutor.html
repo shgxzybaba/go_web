@@ -1,19 +1,26 @@
 <div class="flex flex-col items-center">
-    <div class="flex flex-row items-center">
-        <div class="basis-1/2">
-            <h1 class="text-xl font-extrabold">{{.FullName}}</h1>
-        </div>
-        <div class="container self-center flex-auto">
+
+    <div class="grid grid-cols-3 gap-8 items-center">
+        <div class="container justify-self-start col-span-1">
             <img src="" class="h-12 w-12">
         </div>
-    </div>
-    <div class="flex flex-row items-center">
-        <div class="font-bold">
+        <div class="col-span-2">
+            <h1 class="text-xl font-extrabold">{{.FullName}}</h1>
+        </div>
+
+        <div class="font-bold col-span-1">
             Years of Experience:
         </div>
-        <div>
+        <div class="col-span-2">
             {{.YearsOfExperience}}
         </div>
+        <div class="col-span-1">
+            Note to students:
+        </div>
+        <div class="col-span-2">
+            I hate noise in my classes. Always come with your textbooks!
+        </div>
+
     </div>
 
 </div>

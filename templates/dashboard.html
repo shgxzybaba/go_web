@@ -1,6 +1,6 @@
 {{template "partials/navbar" .}}
 
-<div class="flex flex-col space-y-4 ml-12 mt-32">
+<div class="flex flex-col space-y-4 pl-12 pt-32 h-full text-teal-900 bg-teal-50">
 
     <h1 class="text-2xl font-extrabold self-start">
         Welcome {{.Student.Username }}
@@ -8,64 +8,72 @@
 
 
     <div class="flex flex-row">
-        <div class="basis-1/2 flex flex-col ">
-            <h3 class="text-xl font-bold p-2">
-                Here are the courses for today.
-            </h3>
+        <div class="basis-1/2 flex flex-col">
+            <div class="flex flex-col mb-8 p-8 border-solid border-2 shadow-xl">
 
-            {{range .coursesForTheDay}}
-            <div class="p-2 border-2 border-solid flex flex-row space-x-2 items-stretch">
-                <div class="self-center p-2">{{.Title}}</div>
-                <div class="self-center p-2">{{.Description}}</div>
-
-                <button hx-get="/notes?course={{.Title}}"
-                        hx-trigger="click"
-                        hx-target="#info-div"
-                        hx-swap="innerHTML"
-
-                        class="bg-indigo-500 p-2 border-solid rounded text-white self-center"
-                >
-                    See notes
-                </button>
-            </div>
-            {{else}}
-            <div>
-                You have no course for today, interesting!
-            </div>
-            {{end}}
-            <div class="mb-8 mt-12 flex flex-col">
-
-                <h3 class="text-xl font-bold p-2">
-                    Here are all the courses you offer.
+                <h3 class="text-xl font-bold">
+                    Here are the courses for today.
                 </h3>
 
-                <div class="flex flex-col items-stretch items-center">
-
-                    {{range .Student.Courses}}
-                    <div class="p-2 border-2 border-solid flex flex-row space-x-2 items-stretch">
+                <div class="mt-8 mb-12 flex flex-col">
+                    {{range .coursesForTheDay}}
+                    <div class="p-2 border-t-2 border-solid flex flex-row space-x-2 items-stretch">
                         <div class="self-center p-2">{{.Title}}</div>
                         <div class="self-center p-2">{{.Description}}</div>
-                        <div class="justify-self-end">
-                            <button hx-get="/tutor?course={{.Title}}"
+
+                        <div class="flex flex-row justify-end basis-1/2">
+
+                            <button hx-get="/notes?course={{.Title}}"
                                     hx-trigger="click"
                                     hx-target="#info-div"
                                     hx-swap="innerHTML"
 
-                                    class="bg-indigo-500 p-2 border-solid rounded text-white self-center"
+                                    class="scale-75 hover:scale-100 bg-teal-500 p-2 border-solid rounded text-white justify-self-end"
                             >
-                                See tutor
+                                See notes
                             </button>
                         </div>
+                    </div>
+                    {{else}}
+                    <div>
+                        You have no course for today, interesting!
                     </div>
                     {{end}}
                 </div>
             </div>
+            <div class="flex flex-col mb-8 p-8 border-solid border-2 shadow-xl">
+                <h3 class="text-xl font-bold">
+                    Here are all the courses you offer.
+                </h3>
 
-            <div class="flex basis-1/2 flex-row">
+                <div class="mt-8 mb-12 flex flex-col">
+
+
+                    <div class="flex flex-col items-stretch items-center">
+
+                        {{range .Student.Courses}}
+                        <div class="p-2 border-t-2 border-solid flex flex-row space-x-2 items-stretch justify-start">
+                            <div class="self-center p-2">{{.Title}}</div>
+                            <div class="self-center p-2">{{.Description}}</div>
+                            <div class=" flex flex-row justify-end basis-1/2">
+                                <button hx-get="/tutor?course={{.Title}}"
+                                        hx-trigger="click"
+                                        hx-target="#info-div"
+                                        hx-swap="innerHTML"
+
+                                        class="scale-75 hover:scale-100 bg-teal-500 p-2 border-solid rounded text-white transition duration-0 hover:duration-150 ease-in-out"
+                                >
+                                    See tutor
+                                </button>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
             </div>
 
         </div>
-        <div class="flex basis-1/2 flex-col flex items-stretch">
+        <div class="flex basis-1/2 flex-col flex items-stretch ml-8 border-l-2 shadow-inner p-12">
             <div id="info-div">
 
             </div>
