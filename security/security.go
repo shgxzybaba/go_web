@@ -58,7 +58,7 @@ func LoginHandler(c *fiber.Ctx) (err error) {
 		if err != nil {
 			return err
 		}
-		sessionData := data.SessionData{UserId: int(student.Id)}
+		sessionData := data.SessionData{UserId: int(student.Id), Email: student.Username}
 		sess.Set("session_data", sessionData)
 		if err := sess.Save(); err != nil {
 			return c.Status(fiber.StatusInternalServerError).SendString("Unable to store session")
@@ -69,9 +69,20 @@ func LoginHandler(c *fiber.Ctx) (err error) {
 
 }
 
+func LogoutHandler(c *fiber.Ctx) error {
+
+	sess, e := data.SessionStore.Get(c)
+	if e != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Attempt to logout failed, try again!")
+	}
+	if e = sess.Destroy(); e != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Attempt to logout failed, try again!")
+	}
+	return c.Redirect("/", fiber.StatusFound)
+}
+
 func GetLoginPage(c *fiber.Ctx) error {
-	response := utils.Data{}
-	return c.Render("login", response, "layout")
+	return c.Render("login", utils.DefaultResponse(c), "layout")
 }
 
 func init() {
@@ -85,7 +96,15 @@ func GetSessionData(c *fiber.Ctx) (sessionData data.SessionData, err error) {
 	if e != nil {
 
 		err = errors.New("unable to get session data from request")
+		return
 	}
-	sessionData = (sess.Get("session_data")).(data.SessionData)
+	s := sess.Get("session_data")
+
+	if s == nil {
+		err = errors.New("unable to get session data from request")
+		return
+	}
+
+	sessionData = s.(data.SessionData)
 	return
 }

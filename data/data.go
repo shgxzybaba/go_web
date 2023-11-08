@@ -15,7 +15,8 @@ var (
 )
 
 type SessionData struct {
-	UserId int `json:"user_id"`
+	UserId int    `json:"user_id"`
+	Email  string `json:"email"`
 }
 
 func init() {

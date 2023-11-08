@@ -12,16 +12,9 @@ import (
 )
 
 func indexHandler(c *fiber.Ctx) (err error) {
+	log.Info(c.Locals("Headers"))
 
-	response := utils.Data{}
-	students, err := data.FetchAllStudents()
-	if err != nil {
-		response.Err = err.Error()
-		return c.Render("error", response)
-	}
-	response.Response, response.Err = students, ""
-
-	return c.Render("index", response, "layout")
+	return c.Render("index", utils.DefaultResponse(c), "layout")
 }
 
 func main() {
@@ -35,6 +28,35 @@ func main() {
 		PassLocalsToViews: true,
 	})
 
+	app.Use(func(c *fiber.Ctx) error {
+		sess, err := security.GetSessionData(c)
+		if err != nil {
+			return c.Next()
+		}
+
+		c.Locals("sessionData", sess)
+		return c.Next()
+	})
+
+	app.Use(func(c *fiber.Ctx) error {
+
+		if c.Path() == "/static" || c.Path() == "/logout" {
+			return c.Next()
+		}
+
+		if c.Locals("sessionData") != nil {
+			sessionData := (c.Locals("sessionData")).(data.SessionData)
+			c.Locals("Headers", utils.LoggedInHeaders)
+			c.Locals("LoggedIn", true)
+			c.Locals("Username", sessionData.Email)
+		} else {
+			c.Locals("LoggedIn", false)
+			c.Locals("Headers", utils.HeaderLinks)
+		}
+
+		return c.Next()
+	})
+
 	app.Use(logger.New(logger.Config{
 		// For more options, see the Config section
 		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
@@ -45,6 +67,7 @@ func main() {
 	app.Get("/", indexHandler)
 	app.Get("/login", security.GetLoginPage)
 	app.Post("/login", security.LoginHandler)
+	app.Get("/logout", security.LogoutHandler)
 	app.Get("/dashboard", handlers.DashboardHandler)
 	app.Get("/tutor", handlers.GetTutor)
 	app.Get("/notes", handlers.AllCourseNotes)

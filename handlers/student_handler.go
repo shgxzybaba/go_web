@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/shgxzybaba/go_web01/data"
-	"github.com/shgxzybaba/go_web01/security"
 	"github.com/shgxzybaba/go_web01/utils"
 )
 
@@ -14,10 +13,12 @@ type NotesDto struct {
 
 func DashboardHandler(c *fiber.Ctx) error {
 
-	sessionData, err := security.GetSessionData(c)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("unable to get user sessions")
+	sess := c.Locals("sessionData")
+	if sess == nil {
+		return c.Redirect("/")
 	}
+
+	sessionData := (sess).(data.SessionData)
 
 	// Get student from session
 	student, err := data.GetStudentFromId(sessionData.UserId)
@@ -40,10 +41,12 @@ func DashboardHandler(c *fiber.Ctx) error {
 
 func AllCourseNotes(c *fiber.Ctx) error {
 
-	sessionData, err := security.GetSessionData(c)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("unable to get user sessions")
+	sess := c.Locals("sessionData")
+	if sess == nil {
+		return c.Redirect("/")
 	}
+
+	sessionData := (sess).(data.SessionData)
 	course := c.Query("course", "")
 	notes, err := data.GetStudentCourseNotes(course, sessionData.UserId)
 
@@ -62,10 +65,11 @@ func AllCourseNotes(c *fiber.Ctx) error {
 
 func AddNote(c *fiber.Ctx) error {
 
-	_, err := security.GetSessionData(c)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("unable to get user sessions")
+	sess := c.Locals("sessionData")
+	if sess == nil {
+		return c.Redirect("/")
 	}
+
 	course := c.Query("course", "") //todo: validate param
 	if course == "" {
 		return c.Status(fiber.StatusNotAcceptable).SendString("no course was selected")
@@ -78,16 +82,18 @@ func AddNote(c *fiber.Ctx) error {
 }
 
 func CreateNote(c *fiber.Ctx) error {
-	sessionData, err := security.GetSessionData(c)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("unable to get user sessions")
+	sess := c.Locals("sessionData")
+	if sess == nil {
+		return c.Redirect("/")
 	}
+
+	sessionData := (sess).(data.SessionData)
 	course := c.Query("course", "")
 	note := c.FormValue("create-note") //todo: validate this
 	if note == "" {
 		return c.Status(fiber.StatusBadRequest).SendString("Note text cannot be empty")
 	}
-	_, err = data.SaveStudentNote(course, sessionData.UserId, note)
+	_, err := data.SaveStudentNote(course, sessionData.UserId, note)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("An error occurred while saving note")
 	}

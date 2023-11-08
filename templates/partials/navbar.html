@@ -1,10 +1,12 @@
-<div class="fixed top-0 left-0 p-2 y-10 bg-slate-400 w-full h-12 flex flex-row space-x-8">
-    <div class="basis-1/2">
-
-    </div>
-    <ul class="flex flex-row space-x-4 pt-2 pb-2">
-        <li class="mr-4"><a class="hover:bg-white p-2" href="/static"></a>Home</li>
-        <li class="mr-4"><a class="hover:bg-white p-2" href="/about">About</a></li>
-        <li class="mr-4"><a class="hover:bg-white p-2" href="/login">Signup</a></li>
+<div class="fixed
+top-0 left-0 p-2 y-10 bg-teal-500
+w-full h-16 flex flex-row space-x-8">
+    <div class=" basis-1/2 self-center ml-8"><a class="font-extrabold text-2xl text-teal-50 p-2" href="/">classBuddy</a></div>
+    <ul class="flex flex-row space-x-4 self-center mr-8 basis-1/2 justify-end">
+        {{range $title, $link := .Headers}}
+        <li class="mr-4"><a class="hover:bg-teal-50 hover:text-teal-600 p-2 rounded text-teal-50 font-bold" href="{{$link}}">{{$title}}</a></li>
+        {{else}}
+        <li class="mr-4"><a class="hover:bg-teal-50 hover:text-teal-600 p-2 rounded text-teal-50 font-bold" href="/about">About</a></li>
+        {{end}}
     </ul>
 </div>
