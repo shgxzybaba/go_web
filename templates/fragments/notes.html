@@ -1,15 +1,18 @@
 <div class="flex flex-col items-stretch space-y-4" id="this">
     <h2 class="font-bold text-xl text-teal-900 border-b-2 w-full pb-4">All notes</h2>
     {{range .Notes}}
-    <div id="this-note" class="grid grid-cols-5 items-center gap-8">
-        <div class="p-4 border-2 border-solid bg-slate-50 col-span-4 w-full">{{.Text}}</div>
-        <button hx-get="/edit_note?note={{.Id}}"
-        hx-trigger="click"
-        hx-target="#this-note"
-        hx-swap="innerHTML"
-        class="bg-teal-500 p-2 border-solid rounded text-white self-center col-span-1"
+    <div id="this-note-{{.Id}}" class="grid grid-cols-5 items-center gap-8">
+        <div class="p-4 border-2 border-solid bg-slate-50 col-span-4 w-full"
+             id="note-{{.Id}}">{{.Text}}
+        </div>
+        <button hx-get="/edit_note?note_id={{.Id}}"
+                hx-trigger="click"
+                hx-target="#this-note-{{.Id}}"
+                hx-swap="outerHTML"
+                id="button"
+                class="bg-teal-500 p-2 border-solid rounded text-white self-center col-span-1"
         >
-        Edit
+            Edit
         </button>
     </div>
     {{else}}

@@ -100,3 +100,28 @@ func CreateNote(c *fiber.Ctx) error {
 
 	return AllCourseNotes(c)
 }
+
+func EditNote(c *fiber.Ctx) error {
+	sess := c.Locals("sessionData")
+
+	if sess == nil {
+		return c.Redirect("/")
+	}
+	sessionData := (sess).(data.SessionData)
+	noteId := c.QueryInt("note_id", 0)
+	if noteId == 0 {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid note id")
+	}
+
+	note, err := data.GetStudentNote(sessionData.UserId, noteId)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid note id")
+	}
+	html, err := utils.GenerateHTML(note, "edit-note")
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("unable to get user sessions")
+	}
+	return c.SendString(html)
+
+}

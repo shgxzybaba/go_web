@@ -73,6 +73,7 @@ func main() {
 	app.Get("/notes", handlers.AllCourseNotes)
 	app.Get("/add_note", handlers.AddNote)
 	app.Post("/note", handlers.CreateNote)
+	app.Get("/edit_note", handlers.EditNote)
 
 	e := app.Listen(":8085")
 	if e != nil {

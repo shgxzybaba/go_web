@@ -162,3 +162,13 @@ select $1, $2, c.id from courses c where c.title = $3`
 	_, err := DB.Exec(query, note, studentId, course)
 	return note, err
 }
+
+func GetStudentNote(studentId int, noteId int) (note CourseNote, err error) {
+	query := `select n.id, n.text from notes n
+where n.student_id = $1 and n.id = $2
+`
+	row := DB.QueryRow(query, studentId, noteId)
+	courseNote := CourseNote{}
+	err = row.Scan(&courseNote.Id, &courseNote.Text)
+	return
+}

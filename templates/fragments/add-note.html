@@ -9,7 +9,7 @@
     <button hx-post="/note?course={{.}}"
             hx-trigger="click"
             hx-target="#create-note"
-            hx-swap="innerHTML"
+            hx-swap="innerHTML transition:true"
             hx-confirm="Are you done editing?"
 
             class="bg-teal-500 p-2 border-solid rounded text-teal-50 self-center flex-none"
