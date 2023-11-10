@@ -1,7 +1,12 @@
-{{define "content" }}
+{{template "partials/navbar" .}}
+
 <div class="flex flex-col p-2 m-32 divide-y-4 divide-blue-200">
     <div class="float-none">
+        {{if .IsLoggedIn}}
+        <h1 class="w-1/2 h-24 text-4xl w-full font-extrabold">Welcome, {{.Username}}, to the best class management application</h1>
+        {{else}}
         <h1 class="w-1/2 h-24 text-4xl w-full font-extrabold">Welcome to the best class management application</h1>
+        {{end}}
     </div>
     <div class="flex flex-row h-72">
         <div class="basis-1/2 flex flex-col mb-8">
@@ -9,6 +14,9 @@
             <p class="p-2">
                 Instead of taking a heavy bag to school, use this application to choose what to put in your bags
             </p>
+            {{if .IsLoggedIn}}
+            <a class="bg-teal-500 text-teal-50" href="/dashboard">Take me there!</a>
+            {{end}}
         </div>
         <img src="/static/undraw_bookshelves_re_lxoy.svg" class="basis-1/2 p-8 h-full w-full transition ease-in-out delay-150">
     </div>
@@ -19,10 +27,12 @@
             <p class="p-2">
                 Know which teachers are coming and decide whether you want to see them or not
             </p>
+            {{if .IsLoggedIn}}
+            <a class="bg-teal-500 text-teal-50" href="/dashboard">Take me there!</a>
+            {{end}}
 
         </div>
 
     </div>
 
 </div>
-{{end }}

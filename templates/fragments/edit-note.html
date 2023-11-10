@@ -1,0 +1,21 @@
+<div id="this-note-{{.Id}}" class="grid grid-cols-5 items-center gap-8">
+    <div id="note" class="p-4 border-2 border-solid bg-slate-50 col-span-4 w-full flex flex-col space-x-2">
+        <label for="note-edit">Edit note</label>
+        <textarea id="note-edit" rows="4" cols="50" name="edit-note"
+                  class="p-2 grow h-32 self-center border-solid border-2 rounded text-blue-500"
+                  hx-validate="true"
+                  content=""
+        >
+  {{.Text}}
+  </textarea>
+    </div>
+    <button hx-post="/update_note?note_id={{.Id}}"
+            hx-trigger="click"
+            hx-target="#this-note"
+            hx-swap="innerHTML"
+            id="button"
+            class="bg-teal-500 p-2 border-solid rounded text-white self-center col-span-1"
+    >
+        Update
+    </button>
+</div>

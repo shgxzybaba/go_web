@@ -1,22 +1,16 @@
-{{ define "layout" }}
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=9" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="/static/styles.css" />
+<html lang="en" class="h-full w-full">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="/static/styles.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://unpkg.com/htmx.org@1.9.7" integrity="sha384-EAzY246d6BpbWR7sQ8+WEm40J8c3dHFsqC58IgPlh4kMbRRI6P6WA+LA/qGAyAu8" crossorigin="anonymous"></script>
     <title>Go Web</title>
-  </head>
-  <body>
-
-    {{ template "navbar" . }}
-
-<div class="mt-32">
-  {{ template "content" .Response }}
-</div>
-  </body>
+</head>
+<body class="h-full w-full">
+    {{embed}}
+</body>
 </html>
 
-{{ end }}

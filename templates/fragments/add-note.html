@@ -1,0 +1,19 @@
+<form class="flex flex-row space-x-4 ml-12 items-stretch" id="create-note">
+    <div class="flex flex-col space-y-2">
+
+        <label for="multiline-input" class="font-bold self-center flex-none">Add a new note to {{.}}</label>
+        <textarea id="multiline-input" placeholder="Type in your note here" name="create-note" rows="4" cols="50"
+                  class="p-2 grow h-32 self-center border-solid border-2 rounded text-blue-500">
+        </textarea>
+    </div>
+    <button hx-post="/note?course={{.}}"
+            hx-trigger="click"
+            hx-target="#create-note"
+            hx-swap="innerHTML transition:true"
+            hx-confirm="Are you done editing?"
+
+            class="bg-teal-500 p-2 border-solid rounded text-teal-50 self-center flex-none"
+    >
+        Add
+    </button>
+</form>

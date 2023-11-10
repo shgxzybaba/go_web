@@ -1,32 +1,33 @@
-{{define "content"}}
-<div class="w-full h-full flex flex-row space-y-8 items-stretch">
-    <div class="flex flex-col basis-1/2 space-y-8 mt-32 pl-8 items-center">
-        <h2 class="text-xl font-bold">Login to access your profile</h2>
-        <form class="flex flex-col space-x-2 shadow-xl ml-12 w-1/2 p-8 items-start" action="/login" enctype="application/x-www-form-urlencoded" method="post">
+{{template "partials/navbar" . }}
 
-            <div class="flex flex-col gap-20px">
-                <div>
-                    <label for="username" class="text-small">Username:</label></div>
-                <div>
-                    <input type="text" placeholder="user@xyz.com" name="username" id="username" class="border-solid border-2 p-2 rounded"></div>
-            </div>
+<div class="w-full h-full flex flex-row space-y-8 items-stretch bg-teal-400">
+    <div class="flex flex-col basis-1/2 space-y-2 mt-32 pl-8 items-center">
+        <h2 class="text-xl font-bold text-teal-50">Login to access your profile</h2>
+        <form class="flex flex-col gap-30px shadow-xl ml-12 w-1/2 p-8 items-start bg-teal-50 rounded" action="/login" enctype="application/x-www-form-urlencoded" method="post">
 
-            <div class="flex flex-col gap-20px">
+            <div class="flex flex-col gap-20px w-full">
                 <div class="text-small p-1">
-                  <label for="password">Password: </label></div>
+                    <label for="username" class="text-teal-900 text-small">Username:</label></div>
                 <div class="p-1">
-                    <input type="password" placeholder="password" name="password" id="password" class="border-solid border-2 p-2 rounded"></div>
+                    <input type="text" placeholder="user@xyz.com" name="username" id="username" class="border-solid border-2 p-2 rounded w-full"></div>
             </div>
 
-            <button type="submit" class="w-full rounded border-solid border-2 mt-8 hover:bg-indigo-500">Login</button>
+            <div class="flex flex-col gap-20px w-full">
+                <div class="text-small p-1">
+                  <label for="password" class="text-teal-900 text-small">Password: </label></div>
+                <div class="p-1">
+                    <input type="password" placeholder="password" name="password" id="password" class="border-solid border-2 p-2 rounded w-full"></div>
+            </div>
+
+            <div class="mt-32 basis-1/2 self-center w-full rounded">
+                <button type="submit" class="w-full bg-teal-500 text-teal-50 p-2 rounded border-solid border-2 hover:bg-teal-400">Login</button>
+            </div>
 
         </form>
 
         
     </div>
-    <div class="basis-1/2 mt-32 bg-indigo-500 flex flex-row self-center h-full">
-        <img src="/static/login.svg" class="w-1/2 h-full self-center">
+    <div class="basis-1/2 mt-32 flex flex-row self-center h-full">
+        <img src="/static/login.svg" class="w-full h-full self-center p-8">
     </div>
 </div>
-
-{{end}}

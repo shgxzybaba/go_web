@@ -1,9 +1,7 @@
 package data
 
 import (
-	"errors"
 	"fmt"
-	"github.com/shgxzybaba/go_web01/utils"
 	"net/http"
 	"time"
 )
@@ -21,6 +19,12 @@ type Course struct {
 	Description string
 	Today       bool
 	Days        []string
+}
+
+type CourseNote struct {
+	Id          int
+	Text        string
+	CourseTitle string
 }
 
 func (c *Course) OfferedDays() (err error) {
@@ -56,8 +60,16 @@ where c.title = $1
 	return
 
 }
+func (s *Student) TodaysCourses() (courses []Course) {
+	for _, c := range s.Courses {
+		if c.Today {
+			courses = append(courses, c)
+		}
+	}
+	return
+}
 
-func (s *Student) addCourses() (err error) {
+func (s *Student) AddCourses() (err error) {
 	fmt.Println("Adding courses to student")
 
 	query := `
@@ -85,19 +97,9 @@ where sc.student_id = $1;
 
 }
 
-func (s *Student) CreateSession() (session Session, err error) {
-
-	fmt.Println("Creating session")
-
-	uuid := utils.GenerateUUID()
-	session = Session{Uuid: uuid, UserId: int(s.Id)}
-	_, err = DB.Exec("INSERT INTO sessions(user_id, uuid) values ($1, $2)", session.UserId, session.Uuid)
-	return
-}
-
-func getStudentFromSession(uuid string) (student Student, err error) {
+func GetStudentFromId(id int) (student Student, err error) {
 	student = Student{}
-	row := DB.QueryRow("SELECT code, username from student join sessions s on student.code = s.user_id where s.uuid = $1", uuid)
+	row := DB.QueryRow("SELECT code, username from student s where s.id = $1", id)
 	err = row.Scan(&student.Id, &student.Username)
 	return
 }
@@ -128,30 +130,45 @@ func FetchAllStudents() (students []Student, err error) {
 	return students, nil // Return the populated slice and no error
 }
 
-func DashboardHandler(w http.ResponseWriter, r *http.Request) {
-	var student Student
-	var response = utils.Data{}
-
-	cookie, err := r.Cookie("session-id")
+func GetStudentCourseNotes(course string, studentId int) (notes []CourseNote, err error) {
+	query := `SELECT n.text,n.id, c.title from notes n
+            join courses c on c.id = n.course_id
+            where n.student_id = $1
+            and c.title = $2`
+	rows, err := DB.Query(query, studentId, course)
 	if err != nil {
-		response.ErrorResponse(errors.New("session ID cookie not found"))
-		utils.GenerateHTML(w, response, "layout", "navbar", "error") // Assuming you have an error page template
-		return
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		note := CourseNote{}
+		if err := rows.Scan(&note.Text, &note.Id, &note.CourseTitle); err != nil {
+			return nil, err // Return nil slice and error
+		}
+		notes = append(notes, note)
 	}
 
-	student, err = getStudentFromSession(cookie.Value)
-	if err != nil {
-		response.ErrorResponse(errors.New("failed to get student from session"))
-		utils.GenerateHTML(w, response, "layout", "navbar", "error") // Assuming you have an error page template
-		return
+	if err := rows.Err(); err != nil {
+		return nil, err // Return nil slice and error if there was an error during iteration
 	}
 
-	err = student.addCourses()
-	if err != nil {
-		response.ErrorResponse(errors.New("failed to add courses to the student"))
-		utils.GenerateHTML(w, response, "layout", "navbar", "error") // Assuming you have an error page template
-		return
-	}
-	response.DataResponse(student)
-	utils.GenerateHTML(w, response, "layout", "navbar", "dashboard")
+	return
+}
+
+func SaveStudentNote(course string, studentId int, note string) (string, error) {
+	query := `insert into notes(text, student_id, course_id)
+select $1, $2, c.id from courses c where c.title = $3`
+	_, err := DB.Exec(query, note, studentId, course)
+	return note, err
+}
+
+func GetStudentNote(studentId int, noteId int) (note CourseNote, err error) {
+	query := `select n.id, n.text from notes n
+where n.student_id = $1 and n.id = $2
+`
+	row := DB.QueryRow(query, studentId, noteId)
+	courseNote := CourseNote{}
+	err = row.Scan(&courseNote.Id, &courseNote.Text)
+	return
 }

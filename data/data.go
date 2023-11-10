@@ -3,30 +3,20 @@ package data
 import (
 	"database/sql"
 	"fmt"
-
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/storage/postgres/v2"
 	_ "github.com/lib/pq"
 	"time"
 )
 
 var (
-	DB *sql.DB
+	DB           *sql.DB
+	SessionStore *session.Store
 )
 
-type Session struct {
-	Uuid      string
-	UserId    int
-	CreatedAt time.Time
-}
-
-func (session *Session) Check() (ok bool, err error) {
-
-	rows := DB.QueryRow("SELECT * FROM sessions where uuid = $1", session.Uuid)
-	if err != nil {
-		return false, err // Return nil slice and error
-	}
-
-	ok = rows != nil
-	return
+type SessionData struct {
+	UserId int    `json:"user_id"`
+	Email  string `json:"email"`
 }
 
 func init() {
@@ -46,6 +36,26 @@ func init() {
 		panic(err)
 	}
 	fmt.Println("Database connection successful")
+
+	if err != nil {
+		fmt.Println("Could not create pool from database", err)
+		panic(err)
+	}
+
+	SessionStore = session.New(session.Config{
+		Expiration:   24 * time.Hour, // Session expiration time
+		CookieSecure: true,           // Enable secure cookies (HTTPS)
+		Storage: postgres.New(postgres.Config{
+			//DB:       Pool,
+			Table:    "sessions_v2",
+			Host:     "127.0.0.1",
+			Username: "akindurooluwasegun",
+			Database: "go_web01",
+			Port:     5432,
+		}),
+	})
+	SessionStore.RegisterType(SessionData{})
+
 	return
 
 }
@@ -53,8 +63,4 @@ func init() {
 func ShutDown() {
 	fmt.Println("Closing database connections!")
 	DB.Close()
-}
-
-func AllCourses() (courses []string) {
-	return
 }

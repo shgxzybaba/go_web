@@ -1,48 +1,82 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/template/html/v2"
 	"github.com/shgxzybaba/go_web01/data"
+	"github.com/shgxzybaba/go_web01/handlers"
 	"github.com/shgxzybaba/go_web01/security"
 	"github.com/shgxzybaba/go_web01/utils"
-	"net/http"
 )
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+func indexHandler(c *fiber.Ctx) (err error) {
+	log.Info(c.Locals("Headers"))
 
-	response := utils.Data{}
-	students, err := data.FetchAllStudents()
-	if err != nil {
-		response.Err = err.Error()
-		utils.GenerateHTML(w, response, "layout", "navbar", "error")
-		return // Exit the function to prevent further processing
-	}
-	response.Response, response.Err = students, ""
-
-	utils.GenerateHTML(w, response, "layout", "navbar", "index")
+	return c.Render("index", utils.DefaultResponse(c), "layout")
 }
 
 func main() {
 
-	fmt.Println("Hello server!")
-	defer data.ShutDown()
+	log.Info("Hello server!")
 
-	mux := http.NewServeMux()
-	files := http.FileServer(http.Dir("static"))
+	engine := html.New("./templates", ".html")
+	app := fiber.New(fiber.Config{
+		Views:             engine,
+		ViewsLayout:       "layout",
+		PassLocalsToViews: true,
+	})
 
-	mux.Handle("/static/", http.StripPrefix("/static/", files))
-	mux.HandleFunc("/", indexHandler)
-	mux.HandleFunc("/login", security.LoginHandler)
-	mux.HandleFunc("/account", security.BasicSecurity(data.AccountHandler))
-	mux.HandleFunc("/dashboard", security.BasicSecurity(data.DashboardHandler))
+	app.Use(func(c *fiber.Ctx) error {
+		sess, err := security.GetSessionData(c)
+		if err != nil {
+			return c.Next()
+		}
 
-	server := &http.Server{
-		Handler: mux,
-		Addr:    "0.0.0.0:8088",
-	}
+		c.Locals("sessionData", sess)
+		return c.Next()
+	})
 
-	if e := server.ListenAndServe(); e != nil {
-		fmt.Println("Unable to start server", e)
-		return
+	app.Use(func(c *fiber.Ctx) error {
+
+		if c.Path() == "/static" || c.Path() == "/logout" {
+			return c.Next()
+		}
+
+		if c.Locals("sessionData") != nil {
+			sessionData := (c.Locals("sessionData")).(data.SessionData)
+			c.Locals("Headers", utils.LoggedInHeaders)
+			c.Locals("LoggedIn", true)
+			c.Locals("Username", sessionData.Email)
+		} else {
+			c.Locals("LoggedIn", false)
+			c.Locals("Headers", utils.HeaderLinks)
+		}
+
+		return c.Next()
+	})
+
+	app.Use(logger.New(logger.Config{
+		// For more options, see the Config section
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
+	}))
+
+	app.Static("/static", "./static")
+
+	app.Get("/", indexHandler)
+	app.Get("/login", security.GetLoginPage)
+	app.Post("/login", security.LoginHandler)
+	app.Get("/logout", security.LogoutHandler)
+	app.Get("/dashboard", handlers.DashboardHandler)
+	app.Get("/tutor", handlers.GetTutor)
+	app.Get("/notes", handlers.AllCourseNotes)
+	app.Get("/add_note", handlers.AddNote)
+	app.Post("/note", handlers.CreateNote)
+	app.Get("/edit_note", handlers.EditNote)
+
+	e := app.Listen(":8085")
+	if e != nil {
+		log.Error("An error occurred while starting the server", e)
 	}
 }

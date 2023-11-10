@@ -1,24 +1,37 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"html/template"
-	"net/http"
 )
 
-func GenerateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
+var HeaderLinks = map[string]string{"About": "/about", "Login": "/login"}
+var LoggedInHeaders = map[string]string{
+	"Dashboard": "/dashboard",
+	"About":     "/about",
+	"Logout":    "/logout",
+}
+
+func GenerateHTML(data interface{}, fn ...string) (html string, err error) {
 	var files []string
 	for _, file := range fn {
-		files = append(files, fmt.Sprintf("templates/%s.html", file))
+		files = append(files, fmt.Sprintf("templates/fragments/%s.html", file))
 	}
 
 	templates := template.Must(template.ParseFiles(files...))
-	if err1 := templates.ExecuteTemplate(w, "layout", data); err1 != nil {
-		if _, err := fmt.Fprintln(w, "An error occurred while loading template", err1); err != nil {
-			fmt.Println("Could not write to response writer", err1)
-		}
+	tpl := bytes.Buffer{}
+
+	err = templates.Execute(&tpl, data)
+
+	if err != nil {
+		html = ""
+		return
 	}
+	html = tpl.String()
+	return
 }
 
 type Data struct {
@@ -42,4 +55,13 @@ func GenerateUUID() string {
 	uuidString := uuidObj.String()
 
 	return uuidString
+}
+
+func DefaultResponse(c *fiber.Ctx) fiber.Map {
+
+	return fiber.Map{
+		"Headers":    c.Locals("Headers"),
+		"IsLoggedIn": c.Locals("LoggedIn"),
+		"Username":   c.Locals("Username"),
+	}
 }
