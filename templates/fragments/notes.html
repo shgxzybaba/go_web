@@ -1,8 +1,8 @@
 <div class="flex flex-col items-stretch space-y-4" id="this">
     <h2 class="font-bold text-xl text-teal-900 border-b-2 w-full pb-4">All notes</h2>
     {{range .Notes}}
-    <div id="this-note-{{.Id}}" class="group hover:bg-slate-100 grid grid-cols-5 items-center gap-8">
-        <div class="p-4 border-2 border-solid bg-slate-50 col-span-4 w-full"
+    <div id="this-note-{{.Id}}" class="group hover:bg-slate-100 flex flex-row items-center gap-8">
+        <div class=" p-4 border-2 border-solid bg-slate-50 basis-3/4"
              id="note-{{.Id}}">{{.Text}}
         </div>
         <button hx-get="/edit_note?note_id={{.Id}}"
@@ -10,11 +10,12 @@
                 hx-target="#this-note-{{.Id}}"
                 hx-swap="outerHTML"
                 id="button"
-                class="invisible group-hover:visible bg-teal-500 p-2 border-solid rounded text-white self-center col-span-1"
+                class="invisible group-hover:visible bg-teal-500 p-2 border-solid rounded text-white self-start basis-1/4"
         >
             Edit
         </button>
     </div>
+
     {{else}}
     <div>You do not have any note for this course</div>
     {{end}}

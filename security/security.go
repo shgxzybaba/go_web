@@ -19,7 +19,7 @@ func (u *User) user(s data.Student) {
 	u.Id = int(s.Id)
 }
 
-func Login(username, password string) (student data.Student, err error) {
+func Authenticate(username, password string) (student data.Student, err error) {
 	// Execute the query
 	rows := data.DB.QueryRow("SELECT id, username, password FROM student WHERE username = $1", username)
 	student = data.Student{}
@@ -49,7 +49,8 @@ func validatePassword(sent, expected string) (ok bool) {
 }
 func LoginHandler(c *fiber.Ctx) (err error) {
 	user, password := c.FormValue("username"), c.FormValue("password")
-	student, err := Login(user, password)
+	clearExistingSession(c, user)
+	student, err := Authenticate(user, password)
 	if err != nil {
 		return
 	} else {
@@ -79,6 +80,14 @@ func LogoutHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Attempt to logout failed, try again!")
 	}
 	return c.Redirect("/", fiber.StatusFound)
+}
+func clearExistingSession(c *fiber.Ctx, username string) {
+	//destroy the existing session before loging in
+	if sess, e := data.SessionStore.Get(c); nil == e || !sess.Fresh() {
+		if data, err := GetSessionData(c); err == nil && data.Email == username {
+			_ = sess.Destroy()
+		}
+	}
 }
 
 func GetLoginPage(c *fiber.Ctx) error {

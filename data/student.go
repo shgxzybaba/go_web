@@ -163,12 +163,26 @@ select $1, $2, c.id from courses c where c.title = $3`
 	return note, err
 }
 
+func UpdateStudentNote(studentId int, noteId int, note string) (newNote CourseNote, err error) {
+
+	query := `update notes set text = $1 where student_id = $2 and id = $3`
+	_, err = DB.Exec(query, note, studentId, noteId)
+	if err != nil {
+		return
+	}
+	newNote = CourseNote{
+		Id:   noteId,
+		Text: note,
+	}
+	return
+}
+
 func GetStudentNote(studentId int, noteId int) (note CourseNote, err error) {
 	query := `select n.id, n.text from notes n
 where n.student_id = $1 and n.id = $2
 `
 	row := DB.QueryRow(query, studentId, noteId)
-	courseNote := CourseNote{}
-	err = row.Scan(&courseNote.Id, &courseNote.Text)
+	note = CourseNote{}
+	err = row.Scan(&note.Id, &note.Text)
 	return
 }
