@@ -1,4 +1,7 @@
-<div class="flex flex-col items-stretch space-y-4" id="this">
+<div class="flex flex-col items-stretch space-y-4" id="all-notes">
+    <div class="" id="add-note">
+
+    </div>
     <h2 class="font-bold text-xl text-teal-900 border-b-2 w-full pb-4">All notes</h2>
     {{range .Notes}}
     <div id="this-note-{{.Id}}" class="group hover:bg-slate-100 flex flex-row items-center gap-8">
@@ -21,8 +24,8 @@
     {{end}}
     <button hx-get="/add_note?course={{.Title}}"
             hx-trigger="click"
-            hx-target="#this"
-            hx-swap="innerHTML"
+            hx-target="#add-note"
+            hx-swap="innerHTML transition:true"
             class="bg-teal-500 p-2 border-solid rounded text-white self-center"
     >
         Add a new note to this course

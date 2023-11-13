@@ -6,11 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" href="/static/styles.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <script src="https://unpkg.com/htmx.org@1.9.7" integrity="sha384-EAzY246d6BpbWR7sQ8+WEm40J8c3dHFsqC58IgPlh4kMbRRI6P6WA+LA/qGAyAu8" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.7"
+            integrity="sha384-EAzY246d6BpbWR7sQ8+WEm40J8c3dHFsqC58IgPlh4kMbRRI6P6WA+LA/qGAyAu8"
+            crossorigin="anonymous"></script>
     <title>Go Web</title>
 </head>
-<body class="h-full w-full flex flex-col">
-    {{embed}}
+<body>
+<div class="flex flex-row w-full h-full">
+    <div class="h-full w-full flex flex-col items-stretch">
+        {{embed}}
+    </div>
+</div>
 </body>
 </html>
 
