@@ -568,6 +568,10 @@ video {
   }
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .fixed {
   position: fixed;
 }
@@ -986,6 +990,11 @@ video {
   background-color: rgb(240 253 250 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-slate-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+}
+
 .hover\:text-teal-600:hover {
   --tw-text-opacity: 1;
   color: rgb(13 148 136 / var(--tw-text-opacity));
@@ -993,4 +1002,8 @@ video {
 
 .hover\:duration-150:hover {
   transition-duration: 150ms;
+}
+
+.group:hover .group-hover\:visible {
+  visibility: visible;
 }
